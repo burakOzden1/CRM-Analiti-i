@@ -124,7 +124,7 @@ rfm.head()
 
 rfm["monetar_score"] = pd.qcut(rfm['monetary'], 5, labels=[1, 2, 3, 4, 5])
 
-rfm["frequency_score"] = pd.qcut(rfm['frequency'].rank(method="first"), 5, labels=[5, 4, 3, 2, 1])
+rfm["frequency_score"] = pd.qcut(rfm['frequency'].rank(method="first"), 5, labels=[1, 2, 3, 4, 5])
 # Burada ornegin bir sayisi cok fazla tekrar ederek 5 alandan 3 tanesini doldurmus.
 # Bu yuzden hata aldik. rank metoduyla ilk gordugunu ilk sinifa ata diyerek bu problemin onune geciyoruz.
 
@@ -138,16 +138,57 @@ rfm[rfm["RFM_SCORE"] == "55"]
 rfm[rfm["RFM_SCORE"] == "24"]
 
 
+###############################################################
+# 6. RFM Segmentlerinin Oluşturulması ve Analiz Edilmesi (Creating & Analysing RFM Segments)
+###############################################################
+# regex
 
+# RFM isimlendirmesi
+seg_map = {
+    r'[1-2][1-2]': 'hibernating',
+    r'[1-2][3-4]': 'at_Risk',
+    r'[1-2]5': 'cant_loose',
+    r'3[1-2]': 'about_to_sleep',
+    r'33': 'need_attention',
+    r'[3-4][4-5]': 'loyal_customers',
+    r'41': 'promising',
+    r'51': 'new_customers',
+    r'[4-5][2-3]': 'potential_loyalists',
+    r'5[4-5]': 'champions'
+}
 
+rfm['segment'] = rfm['RFM_SCORE'].replace(seg_map, regex=True)
+# segment adinda yeni bir sutun olusturarak seg_map adli sozluge gore bu ifadeleri siniflandirdik.
+rfm.head()
 
+rfm[["segment", "recency", "frequency", "monetary"]].groupby("segment").agg(["mean", "count"])
+# Burada segment, recency, frequency, monetary kolonlarini segment kolouna gore
+# grupladik ve bunlarin ortalamalari ile sayilarini aldik.
+# Bu ifadeyi calistirarak ise kendimize analiz etmek icin yeni bir tablo olusturmus olduk.
 
+rfm[rfm["segment"] == "cant_loose"].head()
+# ornegin segment degeri "cant_loose" yani kaybetmememiz gereken musterilere esit olanlari alarak
+# bu musterilerimizin uzerine daha cok dusebiliriz.
 
+rfm[rfm["segment"] == "cant_loose"].index
+# Burada ise kaybetmememiz gereken musterilerin index bilgilerini yani ID'lerini bir liste halinde cagirdik.
+# Simdi bunu ilgili departmana, bu musterilerle ilgilenmeleri icin gonderebiliriz.
 
+new_df = pd.DataFrame()
+new_df["new_customer_id"] = rfm[rfm["segment"] == "new_customers"].index
+new_df
+# id'lerde bulunan ondaliklari kaldiralim, gerekli degil.
 
+new_df["new_customer_id"] = new_df["new_customer_id"].astype(int)
+# ondaliktan kurtulduk.
+new_df
 
+new_df.to_csv("C:/Users/zbura/OneDrive/Masaüstü/CRM Analytics/3 CRM Analytics/Code/outputs/new_customers.csv")
+# new_df adli ciktimizi csv formatinda kaydederek outputs klasorune yerlestirdik.
+# Oradan ilgili birimlere gonderebiliriz.
 
-
+rfm.to_csv("C:/Users/zbura/OneDrive/Masaüstü/CRM Analytics/3 CRM Analytics/Code/outputs/rfm.csv")
+# Tum tablomuzu da rfm.csv adi ile ayni yola kopyaladik, bu daha cok tercih edilen bir yontem.
 
 
 

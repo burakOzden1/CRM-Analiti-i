@@ -73,7 +73,7 @@ def replace_with_thresholds(dataframe, variable):
 # Verinin Okunması
 #########################
 
-df_ = pd.read_excel("datasets/online_retail_II.xlsx",
+df_ = pd.read_excel(r"D:\CRM Analytics\3 CRM Analytics\Files\crmAnalytics\datasets\online_retail_II.xlsx",
                     sheet_name="Year 2010-2011")
 df = df_.copy()
 df.describe().T

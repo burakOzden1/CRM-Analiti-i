@@ -196,35 +196,6 @@ plot_period_transactions(bgf)
 plt.show()
 
 
-##############################################################
-# 3. GAMMA-GAMMA Modelinin Kurulması
-##############################################################
-
-ggf = GammaGammaFitter(penalizer_coef=0.01)
-
-ggf.fit(cltv_df['frequency'], cltv_df['monetary'])
-
-ggf.conditional_expected_average_profit(cltv_df['frequency'],
-                                        cltv_df['monetary']).head(10)
-
-ggf.conditional_expected_average_profit(cltv_df['frequency'],
-                                        cltv_df['monetary']).sort_values(ascending=False).head(10)
-
-cltv_df["expected_average_profit"] = ggf.conditional_expected_average_profit(cltv_df['frequency'],
-                                                                             cltv_df['monetary'])
-
-cltv_df["expected_average_profit"].sort_values(ascending=False).head(10)
-
-cltv_df.sort_values("expected_average_profit", ascending=False).head(10)
-
-
-
-
-
-
-
-
-
 
 
 

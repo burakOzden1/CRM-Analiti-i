@@ -217,6 +217,37 @@ cltv_df["expected_average_profit"].sort_values(ascending=False).head(10)
 
 cltv_df.sort_values("expected_average_profit", ascending=False).head(10)
 
+##############################################################
+# 4. BG-NBD ve GG modeli ile CLTV'nin hesaplanması.
+##############################################################
+
+cltv = ggf.customer_lifetime_value(bgf,
+                                   cltv_df['frequency'],
+                                   cltv_df['recency'],
+                                   cltv_df['T'],
+                                   cltv_df['monetary'],
+                                   time=3,  # 3 aylık
+                                   freq="W",  # T'nin frekans bilgisi.
+                                   discount_rate=0.01)
+
+cltv.head()
+
+cltv = cltv.reset_index()
+
+cltv_final = cltv_df.merge(cltv, on="Customer ID", how="left")
+cltv_final.sort_values(by="clv", ascending=False).head(10)
+
+##############################################################
+# 5. CLTV'ye Göre Segmentlerin Oluşturulması
+##############################################################
+
+cltv_final
+
+cltv_final["segment"] = pd.qcut(cltv_final["clv"], 4, labels=["D", "C", "B", "A"])
+
+cltv_final.sort_values(by="clv", ascending=False).head(50)
+
+cltv_final.groupby("segment").agg({"count", "mean", "sum"})
 
 
 
